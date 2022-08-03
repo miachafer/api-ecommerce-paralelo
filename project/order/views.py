@@ -13,19 +13,19 @@ class OrderViewSet(viewsets.ModelViewSet):
     """
     The following function returns the full data of an order.
     """
-    def retrieve(self, request,  pk='id'):
+    def retrieve(self, request,  pk="id"):
         try:
             order = self.get_object()
         except Exception as e:
             return Response(status=status.HTTP_404_NOT_FOUND,
-                            data={'Error': str(e)})
+                            data={"Error": str(e)})
 
         order_helper = OrderHelper(order)
         order_details = order_helper.checking_order()
 
         if not order_details:
             return Response(status=status.HTTP_404_NOT_FOUND,
-                            data={'error': 'Order is empty.'})
+                            data={"Error": "Order is empty. Add items."})
 
         return Response(status=status.HTTP_200_OK, data={'order_details': order_details})
 
@@ -50,5 +50,5 @@ class ItemViewSet(viewsets.ModelViewSet):
                 product.save()
                 item.save()
                 return Response({"data": item.data}, status=status.HTTP_201_CREATED)
-        return Response({"status": "Error", "data": "The quantity field cannot be blank."}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({"status": "Error", "data": "Invalid data. Check if the quantity field is not blank."}, status=status.HTTP_400_BAD_REQUEST)
 
