@@ -12,8 +12,8 @@ class Client(models.Model):
         verbose_name="Full name",
         help_text="Type a name and a surname")
     cpf = BRCPFField( 
-        max_length=11, 
-        blank=False, 
+        max_length=11,
+        verbose_name="CPF", 
         primary_key=True, 
         help_text="Type your CPF in the following format: 11122233344")
     address = models.TextField(verbose_name="Address")
