@@ -1,5 +1,7 @@
+from xml.dom import ValidationErr
 from rest_framework import serializers
 from .models import Client
+import phonenumbers
 
 class ClientSerializer(serializers.ModelSerializer):
     class Meta:
@@ -7,7 +9,7 @@ class ClientSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
     """
-    This function validates if the name is composed by more than one word, so it must be name and surname.
+    The following function validates if the name is composed by more than one word, so it must be name and surname.
     """
     def validate_name(self, name):
         full_name = name.split(" ")
@@ -16,10 +18,20 @@ class ClientSerializer(serializers.ModelSerializer):
         return name
 
     """
-    This function validates if the address is not composed only by numbers.
+    The following function validates if the address is not composed only by numbers.
     """
     def validate_address(self, address):
         is_there_a_letter = any(c.isalpha() for c in address)
         if is_there_a_letter == False:
             raise serializers.ValidationError("Your address must contain letters.")
         return address
+
+    """
+    The following function validates if the phone number is valid and possible.
+    """
+
+    def validate_phone(self, phone):
+        brazilian_phone = phonenumbers.parse(phone, "BR")
+        if not phonenumbers.is_possible_numer(brazilian_phone) and not phonenumbers.is_valid_number(brazilian_phone):
+            raise serializers.ValidationError("Type a valid phone number.")
+        return phone
