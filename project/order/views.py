@@ -9,9 +9,10 @@ from project.product.models import Product
 class OrderViewSet(viewsets.ModelViewSet):
     queryset = Order.objects.all()
     serializer_class = OrderSerializer    
-    http_method_names = ['get', 'post', 'put', 'delete']
     
-    # This function returns the full data of an order
+    """
+    The following function returns the full data of an order.
+    """
     def retrieve(self, request,  pk='id'):
         try:
             order = self.get_object()
@@ -32,10 +33,9 @@ class ItemViewSet(viewsets.ModelViewSet):
     queryset = Item.objects.all()
     serializer_class = ItemSerializer
 
-    http_method_names = ['get', 'post', 'put', 'delete']
-
-    # This function goal is to update the quantity of products when a item is created.
-    # If the quantity of items is bigger than the quantity of products, function gets a 400; else: item is created.
+    """
+    The following function updates the quantity of products when a item is created. If the quantity of items is bigger than the quantity of products, function gets a 400 status.
+    """
     def create(self, request):   
         item = self.serializer_class(data=request.data)
         if item.is_valid():
@@ -44,11 +44,11 @@ class ItemViewSet(viewsets.ModelViewSet):
             product_quantity = product.quantity
             
             if int(item_quantity) > int(product_quantity):
-                return Response({"status": "Error", "data": "Try a smaller amount of products."}, status=status.HTTP_400_BAD_REQUEST)
+                return Response({"status": "Error", "data": "This product is not available in stock or you must try a smaller amount of it."}, status=status.HTTP_400_BAD_REQUEST)
             else:
                 product.quantity = product.quantity - int(request.data['quantity'])
                 product.save()
                 item.save()
                 return Response({"data": item.data}, status=status.HTTP_201_CREATED)
-        return Response(status=status.HTTP_400_BAD_REQUEST)
+        return Response({"status": "Error", "data": "The quantity field cannot be blank."}, status=status.HTTP_400_BAD_REQUEST)
 
