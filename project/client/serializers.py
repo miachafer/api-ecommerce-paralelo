@@ -26,11 +26,14 @@ class ClientSerializer(serializers.ModelSerializer):
         return address
 
     """
-    The following function validates if the phone number is valid and possible.
+    The following function validates if the phone number contains only number and if it is valid and possible.
     """
 
     def validate_phone(self, phone):
         brazilian_phone = phonenumbers.parse(phone, "BR")
-        if not phonenumbers.is_possible_numer(brazilian_phone) and not phonenumbers.is_valid_number(brazilian_phone):
+        is_there_a_not_number = phone.isnumeric()
+        if is_there_a_not_number == False:
+            raise serializers.ValidationError("The phone number must contain only numbers.")
+        elif not phonenumbers.is_possible_number(brazilian_phone) and not phonenumbers.is_valid_number(brazilian_phone):
             raise serializers.ValidationError("Type a valid phone number.")
         return phone
